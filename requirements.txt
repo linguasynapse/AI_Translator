@@ -1,0 +1,8 @@
+flask
+python-docx
+openpyxl
+google-genai
+openai
+anthropic
+regex
+pysbd
