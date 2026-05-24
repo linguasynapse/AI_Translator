@@ -58,14 +58,3 @@ AI Translator est une application de bureau qui utilise l'intelligence artificie
 2. Double-cliquez pour lancer
 3. L'application s'ouvre automatiquement dans votre navigateur
 
-### Pour les développeurs
-```bash
-# Cloner le dépôt
-git clone 
-cd AI_Translator
-
-# Installer les dépendances
-pip install -r requirements.txt
-
-# Lancer l'application
-python app.py
