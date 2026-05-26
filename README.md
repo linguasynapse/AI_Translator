@@ -58,3 +58,4 @@ AI Translator est une application de bureau qui utilise l'intelligence artificie
 2. Double-cliquez pour lancer
 3. L'application s'ouvre automatiquement dans votre navigateur
 
+À noter que cette application est open source et publiée avec son code source complet. Sur Windows, certains utilisateurs peuvent voir un avertissement au premier lancement à cause des mécanismes de protection système; cela ne signifie pas nécessairement que l’application est malveillante. Pour vérifier l’intégrité, consultez le dépôt GitHub, le hash de la release et le changelog.
