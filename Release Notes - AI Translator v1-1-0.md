@@ -1,4 +1,4 @@
-# Release Notes - AI Translator v1.1.0
+# Release Notes - v1.1.0
 
 **Release Date:** August 2026
 
