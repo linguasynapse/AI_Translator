@@ -1,26 +1,26 @@
 # Core Framework
-Flask==2.3.3
-Werkzeug==2.3.7
+Flask
+Werkzeug
 
 # API Clients
 google-genai
-openai==1.63.2
-anthropic==0.42.0
+openai
+anthropic
 mistralai
 
 # Document Processing
-python-docx==1.1.2
-openpyxl==3.1.5
+python-docx
+openpyxl
 
 # XML Processing
 lxml
 
 # Text Segmentation
-pysbd==0.3.4
+pysbd
 
 # Web Utilities
-requests==2.32.3
+requests
 
 # Additional Utilities
-python-dotenv==1.0.0
+python-dotenv
 regex
