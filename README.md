@@ -72,6 +72,10 @@ AI Translator est une application de bureau qui utilise l'intelligence artificie
 git clone https://github.com/linguasynapse/AI_Translator.git
 cd AI_Translator
 
+# Créer un environnement virtuel (première installation) et activer l'environnement
+python -m venv .aitranslator
+.aitranslator>\Scripts\activate
+
 # Installer les dépendances
 pip install -r requirements.txt
 
