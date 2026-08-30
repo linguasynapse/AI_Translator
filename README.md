@@ -74,7 +74,7 @@ cd AI_Translator
 
 # Optionnel: Créer un environnement virtuel (première installation) et activer l'environnement
 python -m venv .aitranslator
-.aitranslator>\Scripts\activate
+.aitranslator\Scripts\activate
 
 # Installer les dépendances
 pip install -r requirements.txt
