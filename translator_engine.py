@@ -578,7 +578,25 @@ def generate_tmx(pairs, source_lang, target_lang, out_path):
         f.write(doc.toxml(encoding='utf-8'))
 
     return out
-
+# Sortie tsv    
+def _clean_for_tsv(text):
+    """
+    Nettoie une chaîne pour un fichier TSV :
+    - Remplace les tabulations par des espaces
+    - Remplace les retours à la ligne par des espaces
+    - Supprime les caractères de contrôle
+    """
+    if not isinstance(text, str):
+        text = str(text)
+    # Remplacer les tabulations par un espace
+    text = text.replace('\t', ' ')
+    # Remplacer les retours à la ligne par un espace
+    text = text.replace('\n', ' ').replace('\r', ' ')
+    # Supprimer les caractères de contrôle (sauf espaces)
+    import re
+    text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
+    return text
+    
 def generate_tsv(pairs, source_lang, target_lang, out_path):
     out = str(Path(out_path).with_suffix('.tsv'))
 
