@@ -59,7 +59,7 @@ AI Translator est une application de bureau qui utilise l'intelligence artificie
 
 ## 📦 Installation
 
-### Pour les utilisateurs (Windows)
+### Pour les utilisateurs (uniquement pour Windows v1.0.0)
 
 1. Téléchargez l'exécutable `AI_Translator.exe`
 2. Double-cliquez pour lancer
