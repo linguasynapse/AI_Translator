@@ -654,8 +654,7 @@ def generate_xliff(pairs, source_lang, target_lang, out_path, original_filename=
     return out
 
 # ── DOCX ────────────────────────────────────────────────────────────────
-# ── SDT : détection bloc vs inline ──────────────────────────────────────
-# Vérifier si un élément est dans une balise SDT
+# SDT
 def is_inside_sdt(element):
     """
     Vérifie si un élément XML est un descendant d'une balise w:sdt.
@@ -664,14 +663,10 @@ def is_inside_sdt(element):
     parent = element.getparent()
     # Parcourir les parents successifs
     while parent is not None:
-        if parent.tag == qn('w:sdt'): # Si le parent est une balise <w:sdt>, retourner True
-            return True # Sortie anticipée / Succès. Stoppe immédiatement dès qu'une balise w:sdt est trouvée.
-        # Si ce n'est pas le bon tag, parent = parent.getparent() passe au niveau supérieur 
-        # (le grand-parent, puis le arrière-grand-parent, etc.).
-        # La boucle s'arrête quand on atteint la racine de l'arbre, car le parent de la racine vaut None.
+        if parent.tag == qn('w:sdt'): 
+            return True 
         parent = parent.getparent() 
-    return False # Sortie par défaut / Échec
-    # Placé en dehors de la boucle while, il ne s'exécute que si la boucle s'est terminée sans jamais avoir rencontré de balise w:sdt (c'est-à-dire une fois arrivé à la racine parent is None). Cela confirme que l'élément n'est pas dans un SDT.
+    return False 
 
 def is_inline_sdt(sdt):
     """Vrai si ce <w:sdt> est un enfant DIRECT d'un <w:p> (content control
@@ -682,19 +677,6 @@ def is_inline_sdt(sdt):
     parent = sdt.getparent()
     return parent is not None and parent.tag == qn('w:p')
 
-# ── Lecture/écriture UNIFIÉE d'un paragraphe (runs directs + SDT inline) ──
-# CORRECTIF : p.text / p.runs de python-docx ne voient QUE les <w:r>
-# enfants DIRECTS d'un <w:p> -- ils ignorent tout texte imbriqué dans un
-# <w:sdt>. Sur un paragraphe mixte (runs + SDT inline goog_rdk_*), cela
-# provoquait un double traitement : le paragraphe était traduit "troué"
-# (mots des SDT manquants) et réinjecté dans runs[0], tandis que chaque
-# SDT était traduit isolément (hors contexte) et réinjecté à sa place —
-# cassant l'ordre de lecture (les fragments SDT semblaient "poussés" en
-# fin de paragraphe une fois les runs directs environnants vidés).
-#
-# Les fonctions ci-dessous traitent tout le paragraphe comme UNE SEULE
-# séquence ordonnée de runs, quelle que soit leur provenance.
-# Extraction du texte SDT
 NS_W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 _NSMAP = {'w': NS_W}
 def get_ordered_runs(p_element):
@@ -742,10 +724,7 @@ def set_paragraph_text(p_element, new_text):
     for r in runs[1:]:
         for t in r.findall(qn('w:t')):
             t.text = ""
-
-# Extraction du texte SDT (BLOC uniquement — les SDT inline sont
-# désormais couverts par get_paragraph_full_text / set_paragraph_text
-# sur leur paragraphe parent, pour éviter le double traitement)
+            
 def extract_sdt_text(doc):
     """Extrait le texte des balises w:sdt de premier niveau, EN EXCLUANT
     les SDT inline (imbriqués dans un <w:p>). Ne restent que les SDT
@@ -769,10 +748,6 @@ def extract_sdt_text(doc):
             sdt_elements.append((sdt, text.strip()))
     return sdt_elements
 
-# Remplacement du texte SDT BLOC (Préserve le formatage)
-# Utilisé uniquement pour les SDT de niveau bloc (contenant leurs
-# propres <w:p>) — les SDT inline passent désormais par
-# set_paragraph_text sur leur paragraphe parent.
 def replace_sdt_text(sdt, new_text):
     """Remplace le texte d'un w:sdt BLOC en préservant le formatage du
     premier run. Conserve un filet de sécurité pour le cas inline
@@ -820,9 +795,8 @@ def replace_sdt_text(sdt, new_text):
                 for t in r.findall(qn('w:t')):
                     t.text = ""
     else:
-        # Filet de sécurité : sdtContent sans <w:p> (SDT isolé, non
-        # rattaché à un paragraphe parent). Recherche en profondeur des
-        # runs, remplacement du premier, vidage des suivants.
+        # Filet de sécurité : sdtContent sans <w:p> (SDT isolé, non rattaché à un paragraphe parent). 
+        # Recherche en profondeur des runs, remplacement du premier, vidage des suivants.
         runs = sdt_content.findall('.//w:r', _NSMAP)
         if not runs:
             return
@@ -921,14 +895,13 @@ def translate_docx(inp, out, api_key, sl, tl, model, delay, style_instructions,
                 ctx.pop(0)
 
             # --- Gestion selon le type de segment ---
-            if seg_type in ('p', 'cell'): # 'element' est TOUJOURS un objet Paragraph (même pour les cellules)
+            if seg_type in ('p', 'cell'): 
                 if is_sentence: # Si c'est une phrase segmentée, on stocke la traduction
                     if element not in translated_buffer:
                         translated_buffer[element] = []
                     translated_buffer[element].append(t)
                 else:
-                    # Paragraphe entier : remplacer via la séquence unifiée
-                    # (runs directs + runs imbriqués dans un SDT inline)
+                    # Paragraphe entier : remplacer via la séquence unifiée (runs directs + runs imbriqués dans un SDT inline)
                     set_paragraph_text(element._element, t)
 
             elif seg_type == 'sdt': # Champs de texte structuré (SDT bloc) stocké dans sdt_buffer
@@ -974,7 +947,6 @@ def translate_docx(inp, out, api_key, sl, tl, model, delay, style_instructions,
         if fmt == 'original':
             out_path = str(Path(out).with_suffix('.docx'))
             doc.save(out_path)
-            # Vérifier que le chemin est absolu
             #logger.info(f"DOCX saved to: {out_path}")
             #logger.info(f"File exists: {Path(out_path).exists()}")
             paths.append(out_path)
